@@ -1,0 +1,66 @@
+{
+  "model_type": "XGBClassifier",
+  "training_date_utc": "2026-05-16T23:58:18.029912+00:00",
+  "random_state": 42,
+  "n_train": 7699,
+  "n_val": 1650,
+  "n_test": 1650,
+  "n_features": 25,
+  "feature_names": [
+    "warehouse_block_a",
+    "warehouse_block_b",
+    "warehouse_block_c",
+    "warehouse_block_d",
+    "warehouse_block_f",
+    "mode_of_shipment_flight",
+    "mode_of_shipment_road",
+    "mode_of_shipment_ship",
+    "product_importance_high",
+    "product_importance_low",
+    "product_importance_medium",
+    "gender_f",
+    "gender_m",
+    "weight_class_heavy",
+    "weight_class_light",
+    "weight_class_medium",
+    "customer_care_calls",
+    "customer_rating",
+    "cost_of_product",
+    "prior_purchases",
+    "discount_offered",
+    "weight_in_gms",
+    "discount_x_weight",
+    "calls_per_cost",
+    "high_discount"
+  ],
+  "best_params": {
+    "n_estimators": 650,
+    "max_depth": 9,
+    "learning_rate": 0.17399759045835148,
+    "subsample": 0.6732782208497843,
+    "colsample_bytree": 0.6257737792184679,
+    "min_child_weight": 5,
+    "gamma": 0.033699559254799095,
+    "reg_lambda": 3.2448114894762576
+  },
+  "threshold": 0.5,
+  "f1_optimal_threshold": 0.1,
+  "validation_metrics": {
+    "roc_auc": 0.7238679228008496,
+    "pr_auc": 0.8397969884509687,
+    "f1_at_0.5": 0.6764872521246459,
+    "f1_at_0.4": 0.7328178694158075,
+    "f1_optimal": 0.7471526195899773
+  },
+  "test_metrics": {
+    "roc_auc": 0.7273875042937292,
+    "pr_auc": 0.844356032596155,
+    "f1_at_0.5": 0.6659051970302684
+  },
+  "baselines": {
+    "logreg_val_f1_0.5": 0.6703662597114317,
+    "logreg_val_roc_auc": 0.7224175394907102,
+    "rf_val_f1_0.5": 0.63875,
+    "rf_val_roc_auc": 0.7075123904392197
+  }
+}

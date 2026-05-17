@@ -1,0 +1,28 @@
+# Render Blueprint — auto-deploys this service whenever main is updated on GitHub.
+# https://render.com/docs/blueprint-spec
+#
+# After connecting your GitHub repo to Render:
+#   1. Pick "New > Blueprint" and select this repo
+#   2. Render reads this file and provisions the service
+#   3. In the dashboard, add the secret env var GEMINI_API_KEY (and optionally
+#      GEMINI_MODEL to override the default "gemini-2.5-flash-lite")
+#   4. Every git push to main triggers a fresh deploy
+
+services:
+  - type: web
+    name: shipment-delay-predictor
+    runtime: python
+    plan: free                   # 512MB RAM; sleeps after 15min idle on free tier
+    region: oregon               # change if you want a different region
+    branch: main
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: true             # redeploy on every push to `branch`
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false              # set this in the Render dashboard, not in source
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash-lite
+      - key: PYTHON_VERSION
+        value: 3.11.9

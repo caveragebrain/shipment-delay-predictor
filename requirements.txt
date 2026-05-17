@@ -1,0 +1,24 @@
+# Production runtime dependencies — what Render installs.
+# Dev-only deps (jupyter, optuna, pytest, plotting) live in requirements-dev.txt.
+
+# Core ML / inference
+xgboost==2.1.3
+scikit-learn==1.5.2
+pandas==2.2.3
+numpy==2.1.3
+joblib==1.4.2
+shap==0.46.0
+
+# API
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+python-multipart==0.0.20
+
+# LLM
+google-generativeai==0.8.3
+python-dotenv==1.0.1
+
+# CLI tool (kept here because it's a user-facing surface)
+requests==2.32.3
+rich==13.9.4
