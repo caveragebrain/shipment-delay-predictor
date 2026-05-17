@@ -43,7 +43,7 @@
     "gamma": 0.033699559254799095,
     "reg_lambda": 3.2448114894762576
   },
-  "threshold": 0.5,
+  "threshold": 0.35,
   "f1_optimal_threshold": 0.1,
   "validation_metrics": {
     "roc_auc": 0.7238679228008496,
