@@ -113,9 +113,9 @@ python scripts/predict_cli.py worst-case
 python scripts/predict_cli.py best-case
 
 # Point at the deployed API
-python scripts/predict_cli.py predict --file s.json --url https://your-app.onrender.com
+python scripts/predict_cli.py predict --file s.json --url https://shipment.autoforward.me
 # or export once
-export API_HOST=https://your-app.onrender.com
+export API_HOST=https://shipment.autoforward.me
 ```
 
 ## Testing
@@ -147,28 +147,27 @@ Run extensive model behavior tests:
 python -m scripts.test_battery
 ```
 
-## Deploying to Render (CI/CD)
+## Deployment (DigitalOcean droplet)
 
-This repo is configured for **Render's git-connected auto-deploy**:
+Live at **https://shipment.autoforward.me**. Runs as a systemd service behind
+Caddy (auto-TLS via Let's Encrypt) on a DigitalOcean droplet.
 
-1. **Push this repo to GitHub** (see step-by-step below)
-2. Sign in at [render.com](https://render.com) — free tier is enough
-3. Click **New → Blueprint** and pick your GitHub repo
-4. Render reads `render.yaml` and provisions a web service
-5. In the service's **Environment** tab, add a secret env var:
-   - `GEMINI_API_KEY` = `<your key>`
-   - (`GEMINI_MODEL` defaults to `gemini-2.5-flash-lite` — override if you want)
-6. Click **Manual Deploy** for the first build
-7. Every subsequent `git push origin main` auto-deploys
+Layout on the droplet:
+- App: `/opt/shipment-delay-predictor` (this repo)
+- venv: `/opt/shipment-delay-predictor/.venv`
+- systemd: `/etc/systemd/system/shipment-delay.service` → uvicorn on `127.0.0.1:8001`
+- Caddy vhost: `shipment.autoforward.me { reverse_proxy localhost:8001 }`
 
-### GitHub Actions CI
-On every push and PR, `.github/workflows/ci.yml` installs deps and runs `pytest`.
-Render's deploy is separate — it doesn't depend on the GH Actions run.
+### CI/CD
+`.github/workflows/ci.yml` runs `pytest` on every push/PR.
+`.github/workflows/deploy.yml` SSHes into the droplet on push to `main`,
+pulls, reinstalls deps, and restarts the systemd unit.
 
-### Free-tier caveats
-- 512 MB RAM (this app uses ~250–350 MB at runtime — fits, but tight)
-- Cold start of ~30s after 15 min idle
-- First build takes 5–10 min (SHAP + numba pull in a lot)
+Required GitHub repo secrets:
+- `DEPLOY_SSH_KEY` — private key authorized for `autoforward@209.38.120.65`
+- `DEPLOY_HOST` — `209.38.120.65`
+- `DEPLOY_USER` — `autoforward`
+- `GEMINI_API_KEY` is set in `/opt/shipment-delay-predictor/.env` on the droplet, not in CI.
 
 ## Repo layout
 
@@ -196,7 +195,8 @@ shipment-delay-predictor/
 │   ├── preprocessor.pkl
 │   └── model_metadata.json
 ├── .github/workflows/ci.yml
-├── render.yaml
+├── .github/workflows/deploy.yml
+├── deploy/                  systemd unit + Caddy vhost
 ├── requirements.txt
 ├── requirements-dev.txt
 └── README.md

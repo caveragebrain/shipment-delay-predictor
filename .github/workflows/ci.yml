@@ -1,7 +1,7 @@
 name: CI
 
-# Run tests on every push and PR. Render handles deploys separately
-# via its native GitHub integration (auto-deploy on push to main).
+# Run tests on every push and PR. Deploy workflow (deploy.yml) runs
+# independently on push to main and SSHes into the DO droplet.
 on:
   push:
     branches: [main]
