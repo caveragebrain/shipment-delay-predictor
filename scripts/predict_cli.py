@@ -10,7 +10,7 @@ Usage examples (run from repo root):
   python scripts/predict_cli.py worst-case
   python scripts/predict_cli.py best-case
   python scripts/predict_cli.py sensitivity --file shipment.json
-  python scripts/predict_cli.py predict --file s.json --url https://your-app.onrender.com
+  python scripts/predict_cli.py predict --file s.json --url https://shipment.autoforward.me
 
 If --url is omitted, falls back to $API_HOST or http://localhost:8000.
 """

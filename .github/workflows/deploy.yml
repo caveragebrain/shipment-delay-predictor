@@ -1,7 +1,9 @@
-name: Deploy
+name: Test & Deploy
 
 on:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
   workflow_dispatch:
 
@@ -9,10 +11,45 @@ concurrency:
   group: deploy-prod
   cancel-in-progress: false
 
+env:
+  DEPLOY_HOST: 209.38.120.65
+  DEPLOY_USER: autoforward
+  DEPLOY_PATH: /opt/shipment-delay-predictor
+
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
-    needs: []
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install OpenMP (XGBoost runtime)
+        run: sudo apt-get update && sudo apt-get install -y libomp-dev
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Verify model artifacts are committed
+        run: |
+          test -f model/model.pkl
+          test -f model/preprocessor.pkl
+          test -f model/model_metadata.json
+          test -f data/processed/raw_train.csv
+
+      - name: Run tests
+        run: pytest -q
+
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Configure SSH
@@ -20,20 +57,20 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
 
-      - name: Pull, install, restart
+      - name: Pull, install, restart, health-check
         run: |
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} bash -se <<'EOF'
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" bash -se <<EOF
             set -euo pipefail
-            cd /opt/shipment-delay-predictor
+            cd $DEPLOY_PATH
             git fetch --all
             git reset --hard origin/main
             .venv/bin/pip install -r requirements.txt
             sudo systemctl restart shipment-delay.service
             for i in 1 2 3 4 5 6 7 8 9 10; do
               if curl -fsS http://127.0.0.1:8001/health >/dev/null; then
-                echo "Healthy after ${i}s"
+                echo "Healthy after \${i} attempts"
                 curl -fsS http://127.0.0.1:8001/health
                 exit 0
               fi
@@ -43,3 +80,10 @@ jobs:
             sudo journalctl -u shipment-delay.service -n 30 --no-pager
             exit 1
           EOF
+
+      - name: Public HTTPS smoke test
+        run: |
+          curl -fsS https://shipment.autoforward.me/health
+          curl -fsS -X POST https://shipment.autoforward.me/predict \
+            -H 'Content-Type: application/json' \
+            -d '{"warehouse_block":"F","mode_of_shipment":"Road","customer_care_calls":4,"customer_rating":2,"cost_of_product":180,"prior_purchases":3,"product_importance":"high","gender":"M","discount_offered":45,"weight_in_gms":4200}'
