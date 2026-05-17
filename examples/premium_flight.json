@@ -1,0 +1,12 @@
+{
+  "warehouse_block": "C",
+  "mode_of_shipment": "Flight",
+  "customer_care_calls": 2,
+  "customer_rating": 4,
+  "cost_of_product": 310,
+  "prior_purchases": 6,
+  "product_importance": "high",
+  "gender": "M",
+  "discount_offered": 10,
+  "weight_in_gms": 1500
+}

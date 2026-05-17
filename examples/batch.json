@@ -1,0 +1,98 @@
+[
+  {
+    "warehouse_block": "F",
+    "mode_of_shipment": "Road",
+    "customer_care_calls": 6,
+    "customer_rating": 1,
+    "cost_of_product": 150,
+    "prior_purchases": 2,
+    "product_importance": "low",
+    "gender": "M",
+    "discount_offered": 55,
+    "weight_in_gms": 6500
+  },
+  {
+    "warehouse_block": "B",
+    "mode_of_shipment": "Flight",
+    "customer_care_calls": 1,
+    "customer_rating": 5,
+    "cost_of_product": 280,
+    "prior_purchases": 7,
+    "product_importance": "high",
+    "gender": "F",
+    "discount_offered": 5,
+    "weight_in_gms": 2000
+  },
+  {
+    "warehouse_block": "D",
+    "mode_of_shipment": "Ship",
+    "customer_care_calls": 3,
+    "customer_rating": 3,
+    "cost_of_product": 200,
+    "prior_purchases": 4,
+    "product_importance": "medium",
+    "gender": "M",
+    "discount_offered": 25,
+    "weight_in_gms": 4000
+  },
+  {
+    "warehouse_block": "A",
+    "mode_of_shipment": "Road",
+    "customer_care_calls": 5,
+    "customer_rating": 2,
+    "cost_of_product": 120,
+    "prior_purchases": 3,
+    "product_importance": "low",
+    "gender": "F",
+    "discount_offered": 62,
+    "weight_in_gms": 5800
+  },
+  {
+    "warehouse_block": "C",
+    "mode_of_shipment": "Flight",
+    "customer_care_calls": 2,
+    "customer_rating": 4,
+    "cost_of_product": 310,
+    "prior_purchases": 6,
+    "product_importance": "high",
+    "gender": "M",
+    "discount_offered": 10,
+    "weight_in_gms": 1500
+  },
+  {
+    "warehouse_block": "B",
+    "mode_of_shipment": "Ship",
+    "customer_care_calls": 4,
+    "customer_rating": 3,
+    "cost_of_product": 230,
+    "prior_purchases": 5,
+    "product_importance": "medium",
+    "gender": "F",
+    "discount_offered": 30,
+    "weight_in_gms": 3500
+  },
+  {
+    "warehouse_block": "F",
+    "mode_of_shipment": "Ship",
+    "customer_care_calls": 7,
+    "customer_rating": 1,
+    "cost_of_product": 95,
+    "prior_purchases": 2,
+    "product_importance": "low",
+    "gender": "M",
+    "discount_offered": 60,
+    "weight_in_gms": 7800
+  },
+  {
+    "warehouse_block": "C",
+    "mode_of_shipment": "Road",
+    "customer_care_calls": 2,
+    "customer_rating": 4,
+    "cost_of_product": 260,
+    "prior_purchases": 8,
+    "product_importance": "high",
+    "gender": "F",
+    "discount_offered": 8,
+    "weight_in_gms": 2800
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "warehouse_block": "D",
+  "mode_of_shipment": "Ship",
+  "customer_care_calls": 4,
+  "customer_rating": 2,
+  "cost_of_product": 175,
+  "prior_purchases": 3,
+  "product_importance": "medium",
+  "gender": "M",
+  "discount_offered": 35,
+  "weight_in_gms": 5000,
+  "threshold": 0.4
+}

@@ -1,0 +1,12 @@
+{
+  "warehouse_block": "F",
+  "mode_of_shipment": "Road",
+  "customer_care_calls": 6,
+  "customer_rating": 1,
+  "cost_of_product": 150,
+  "prior_purchases": 2,
+  "product_importance": "low",
+  "gender": "M",
+  "discount_offered": 55,
+  "weight_in_gms": 6500
+}
