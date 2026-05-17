@@ -784,9 +784,12 @@ function drawPC() {
 
   ctx.clearRect(0,0,W,H);
 
-  // Helpers for outcome column
+  // Helpers for outcome column (75% on-time zone on top, 25% delayed zone on bottom)
+  const OUTCOME_SPLIT = 0.75; // fraction of column height reserved for "on-time"
   const outcomeY = (d, prob) => yFor(d, 1 - prob); // prob=0 → top, prob=1 → bottom
-  const datasetOutcomeY = (d, delayed) => delayed ? yFor(d, 0.25) : yFor(d, 0.75); // center of lower / upper half
+  const datasetOutcomeY = (d, delayed) =>
+    delayed ? yFor(d, (1 - OUTCOME_SPLIT) / 2)        // center of bottom (delayed) zone
+            : yFor(d, 1 - OUTCOME_SPLIT / 2);         // center of top (on-time) zone
 
   // Vertical axes
   ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1;
@@ -795,17 +798,17 @@ function drawPC() {
     ctx.beginPath(); ctx.moveTo(x, padY); ctx.lineTo(x, padY + innerH); ctx.stroke();
   });
 
-  // Outcome column: shaded halves + midline + zone labels
+  // Outcome column: shaded zones + threshold line + zone labels
   const outcomeIdx = PC_DIMS.length - 1;
   const ox = colX(outcomeIdx);
-  const midY = padY + innerH / 2;
+  const splitY = padY + innerH * OUTCOME_SPLIT;
   ctx.fillStyle = 'rgba(52,211,153,0.05)';
-  ctx.fillRect(ox - 14, padY, 28, innerH/2);
+  ctx.fillRect(ox - 14, padY, 28, innerH * OUTCOME_SPLIT);
   ctx.fillStyle = 'rgba(248,113,113,0.05)';
-  ctx.fillRect(ox - 14, midY, 28, innerH/2);
+  ctx.fillRect(ox - 14, splitY, 28, innerH * (1 - OUTCOME_SPLIT));
   ctx.strokeStyle = 'rgba(255,255,255,0.18)';
   ctx.setLineDash([3,3]); ctx.beginPath();
-  ctx.moveTo(ox - 14, midY); ctx.lineTo(ox + 14, midY); ctx.stroke();
+  ctx.moveTo(ox - 14, splitY); ctx.lineTo(ox + 14, splitY); ctx.stroke();
   ctx.setLineDash([]);
   ctx.fillStyle = 'rgba(52,211,153,0.7)'; ctx.font = '600 9px Inter, system-ui'; ctx.textAlign = 'center';
   ctx.fillText('on-time', ox, padY - 4);
