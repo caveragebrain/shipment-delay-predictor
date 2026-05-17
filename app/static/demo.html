@@ -748,13 +748,16 @@ function renderShapBars(factors) {
 // ---- parallel coordinates ---------------------------------------------------
 //
 let DATASET = null;
+let LAST_PROB = null;
+let LAST_THRESHOLD = 0.5;
 const PC_DIMS = [
   { key: 'discount_offered',    label: 'discount %', min: 0, max: 65 },
   { key: 'weight_in_gms',       label: 'weight',     min: 1000, max: 8000 },
   { key: 'customer_care_calls', label: 'calls',      min: 1, max: 7 },
   { key: 'customer_rating',     label: 'rating',     min: 1, max: 5 },
   { key: 'prior_purchases',     label: 'prior',      min: 2, max: 10 },
-  { key: 'cost_of_product',     label: 'cost $',     min: 90, max: 320 }
+  { key: 'cost_of_product',     label: 'cost $',     min: 90, max: 320 },
+  { key: '__outcome__',         label: 'outcome',    min: 0, max: 1, outcome: true }
 ];
 
 async function loadDataset() {
@@ -781,12 +784,33 @@ function drawPC() {
 
   ctx.clearRect(0,0,W,H);
 
+  // Helpers for outcome column
+  const outcomeY = (d, prob) => yFor(d, 1 - prob); // prob=0 → top, prob=1 → bottom
+  const datasetOutcomeY = (d, delayed) => delayed ? yFor(d, 0.25) : yFor(d, 0.75); // center of lower / upper half
+
   // Vertical axes
   ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1;
   PC_DIMS.forEach((d,i) => {
     const x = colX(i);
     ctx.beginPath(); ctx.moveTo(x, padY); ctx.lineTo(x, padY + innerH); ctx.stroke();
   });
+
+  // Outcome column: shaded halves + midline + zone labels
+  const outcomeIdx = PC_DIMS.length - 1;
+  const ox = colX(outcomeIdx);
+  const midY = padY + innerH / 2;
+  ctx.fillStyle = 'rgba(52,211,153,0.05)';
+  ctx.fillRect(ox - 14, padY, 28, innerH/2);
+  ctx.fillStyle = 'rgba(248,113,113,0.05)';
+  ctx.fillRect(ox - 14, midY, 28, innerH/2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+  ctx.setLineDash([3,3]); ctx.beginPath();
+  ctx.moveTo(ox - 14, midY); ctx.lineTo(ox + 14, midY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(52,211,153,0.7)'; ctx.font = '600 9px Inter, system-ui'; ctx.textAlign = 'center';
+  ctx.fillText('on-time', ox, padY - 4);
+  ctx.fillStyle = 'rgba(248,113,113,0.7)';
+  ctx.fillText('delayed', ox, padY + innerH + 10);
 
   // Axis labels
   ctx.fillStyle = '#8b95a4'; ctx.font = '600 10px Inter, system-ui'; ctx.textAlign = 'center';
@@ -795,11 +819,12 @@ function drawPC() {
   // Dataset lines
   if (DATASET) {
     DATASET.forEach(row => {
-      ctx.strokeStyle = row.delayed === 1 ? 'rgba(248,113,113,0.08)' : 'rgba(52,211,153,0.08)';
+      const delayed = row.delayed === 1;
+      ctx.strokeStyle = delayed ? 'rgba(248,113,113,0.08)' : 'rgba(52,211,153,0.08)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       PC_DIMS.forEach((d,i) => {
-        const y = yFor(d, +row[d.key] || 0);
+        const y = d.outcome ? datasetOutcomeY(d, delayed) : yFor(d, +row[d.key] || 0);
         if (i === 0) ctx.moveTo(colX(i), y); else ctx.lineTo(colX(i), y);
       });
       ctx.stroke();
@@ -808,14 +833,19 @@ function drawPC() {
 
   // User input line
   const inputs = readInputs();
-  // Gradient line for emphasis
   const grad = ctx.createLinearGradient(padX, 0, padX + innerW, 0);
   grad.addColorStop(0, '#6ea8ff'); grad.addColorStop(1, '#a78bfa');
   ctx.strokeStyle = grad; ctx.lineWidth = 3;
   ctx.shadowColor = 'rgba(110,168,255,0.4)'; ctx.shadowBlur = 8;
   ctx.beginPath();
   PC_DIMS.forEach((d,i) => {
-    const y = yFor(d, +inputs[d.key] || 0);
+    let y;
+    if (d.outcome) {
+      if (LAST_PROB == null) return; // skip outcome segment if no prediction yet
+      y = outcomeY(d, LAST_PROB);
+    } else {
+      y = yFor(d, +inputs[d.key] || 0);
+    }
     if (i === 0) ctx.moveTo(colX(i), y); else ctx.lineTo(colX(i), y);
   });
   ctx.stroke();
@@ -824,7 +854,8 @@ function drawPC() {
   // Dots on user's line
   ctx.fillStyle = '#f0f3f8';
   PC_DIMS.forEach((d,i) => {
-    const y = yFor(d, +inputs[d.key] || 0);
+    if (d.outcome && LAST_PROB == null) return;
+    const y = d.outcome ? outcomeY(d, LAST_PROB) : yFor(d, +inputs[d.key] || 0);
     ctx.beginPath(); ctx.arc(colX(i), y, 3.5, 0, Math.PI*2); ctx.fill();
   });
 }
@@ -848,6 +879,7 @@ async function autoPredict() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const ms = Math.round(performance.now() - t0);
+    LAST_PROB = data.probability; LAST_THRESHOLD = data.threshold_used;
     setRing(data.probability, data.threshold_used);
     setVerdict(data.probability, data.threshold_used, data.confidence);
     $('m-latency').textContent = ms + ' ms';
@@ -874,9 +906,11 @@ async function doExplain() {
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
+    LAST_PROB = data.probability; LAST_THRESHOLD = data.threshold_used;
     setRing(data.probability, data.threshold_used);
     setVerdict(data.probability, data.threshold_used, data.confidence);
     renderShapBars(data.top_factors);
+    drawPC();
     $('explain-text').textContent = data.explanation || '';
     $('explain-actions').innerHTML = (data.suggested_actions || []).map((a,i) =>
       `<li class="action-item"><span class="action-num">${i+1}</span><span>${esc(a)}</span></li>`
@@ -899,12 +933,14 @@ async function doCase(endpoint, label) {
     const res = await fetch(endpoint, { method: 'POST' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
+    LAST_PROB = data.probability; LAST_THRESHOLD = data.threshold_used;
     setRing(data.probability, data.threshold_used);
     setVerdict(data.probability, data.threshold_used, data.confidence);
     const note = $('note-box');
     note.textContent = data.note || '';
     note.classList.toggle('hidden', !data.note);
     $('pred-meta').textContent = label + ' scenario';
+    drawPC();
   } catch (e) { toast(label + ' failed: ' + e.message, true); }
 }
 
