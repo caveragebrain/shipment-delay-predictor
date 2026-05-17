@@ -429,14 +429,14 @@
       <div class="field">
         <div class="field-label">
           <span class="name">Warehouse block</span>
-          <span class="value" id="v-warehouse_block">F</span>
+          <span class="value" id="v-warehouse_block">C</span>
         </div>
         <select id="warehouse_block">
           <option value="A">A — northern hub</option>
           <option value="B">B — east coast</option>
-          <option value="C">C — central</option>
+          <option value="C" selected>C — central</option>
           <option value="D">D — west coast</option>
-          <option value="F" selected>F — flex / overflow</option>
+          <option value="F">F — flex / overflow</option>
         </select>
       </div>
 
@@ -444,12 +444,12 @@
         <div class="field">
           <div class="field-label">
             <span class="name">Mode</span>
-            <span class="value" id="v-mode_of_shipment">Road</span>
+            <span class="value" id="v-mode_of_shipment">Flight</span>
           </div>
           <select id="mode_of_shipment">
-            <option value="Flight">Flight</option>
+            <option value="Flight" selected>Flight</option>
             <option value="Ship">Ship</option>
-            <option value="Road" selected>Road</option>
+            <option value="Road">Road</option>
           </select>
         </div>
         <div class="field">
@@ -468,25 +468,25 @@
       <div class="field">
         <div class="field-label">
           <span class="name">Discount offered</span>
-          <span class="value"><span id="v-discount_offered">45</span>%</span>
+          <span class="value"><span id="v-discount_offered">10</span>%</span>
         </div>
-        <input type="range" id="discount_offered" min="0" max="65" step="1" value="45" />
+        <input type="range" id="discount_offered" min="0" max="65" step="1" value="10" />
       </div>
 
       <div class="field">
         <div class="field-label">
           <span class="name">Weight</span>
-          <span class="value"><span id="v-weight_in_gms">4200</span>g</span>
+          <span class="value"><span id="v-weight_in_gms">1500</span>g</span>
         </div>
-        <input type="range" id="weight_in_gms" min="1000" max="7846" step="50" value="4200" />
+        <input type="range" id="weight_in_gms" min="1000" max="7846" step="50" value="1500" />
       </div>
 
       <div class="field">
         <div class="field-label">
           <span class="name">Cost</span>
-          <span class="value">$<span id="v-cost_of_product">180</span></span>
+          <span class="value">$<span id="v-cost_of_product">260</span></span>
         </div>
-        <input type="range" id="cost_of_product" min="96" max="310" step="1" value="180" />
+        <input type="range" id="cost_of_product" min="96" max="310" step="1" value="260" />
       </div>
     </section>
 
@@ -509,26 +509,26 @@
         <div class="field">
           <div class="field-label">
             <span class="name">Rating</span>
-            <span class="value" id="v-customer_rating">2</span>
+            <span class="value" id="v-customer_rating">4</span>
           </div>
-          <input type="range" id="customer_rating" min="1" max="5" step="1" value="2" />
+          <input type="range" id="customer_rating" min="1" max="5" step="1" value="4" />
         </div>
       </div>
 
       <div class="field">
         <div class="field-label">
           <span class="name">Prior purchases</span>
-          <span class="value" id="v-prior_purchases">3</span>
+          <span class="value" id="v-prior_purchases">6</span>
         </div>
-        <input type="range" id="prior_purchases" min="2" max="10" step="1" value="3" />
+        <input type="range" id="prior_purchases" min="2" max="10" step="1" value="6" />
       </div>
 
       <div class="field">
         <div class="field-label">
           <span class="name">Customer care calls</span>
-          <span class="value" id="v-customer_care_calls">4</span>
+          <span class="value" id="v-customer_care_calls">2</span>
         </div>
-        <input type="range" id="customer_care_calls" min="1" max="7" step="1" value="4" />
+        <input type="range" id="customer_care_calls" min="1" max="7" step="1" value="2" />
       </div>
     </section>
 
@@ -542,7 +542,7 @@
           <span class="name">Threshold</span>
           <span class="value mono" id="v-threshold">0.50</span>
         </div>
-        <input type="range" id="threshold" min="0.05" max="0.95" step="0.01" value="0.50" />
+        <input type="range" id="threshold" min="0.05" max="0.99" step="0.01" value="0.50" />
       </div>
 
       <div class="btn-grid">
